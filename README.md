@@ -1,2 +1,2 @@
 # tic-tac-toe
-tic-tac-toe game developed in golang + vue 2
+tic-tac-toe game developed in golang + js
