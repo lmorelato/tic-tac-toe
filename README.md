@@ -1,2 +1,2 @@
-# tic-tac-toe-vue
-front end for the tic-tac-toe game developed in vue 2
+# tic-tac-toe
+tic-tac-toe game developed in golang + vue 2
