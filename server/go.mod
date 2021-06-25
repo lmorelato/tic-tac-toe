@@ -1,4 +1,4 @@
-module github.com/lmorelato/tic-tac-toe-api
+module github.com/lmorelato/tic-tac-toe
 
 go 1.16
 

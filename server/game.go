@@ -149,7 +149,7 @@ func (g Game) checkWinner(symbol string) bool {
 		if g.Moves[p[0]] == symbol &&
 			g.Moves[p[1]] == symbol &&
 			g.Moves[p[2]] == symbol {
-			log.Println("Wining path found", p)
+			log.Println("Wining path found for symbol", symbol, p)
 			return true
 		}
 	}
