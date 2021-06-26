@@ -57,6 +57,7 @@ export default {
   height: 100px;
   border-bottom: 4px solid #000;
   border-right: 4px solid #000;
+  cursor: pointer;
 }
 
 .board-cell:nth-child(n + 7) {
