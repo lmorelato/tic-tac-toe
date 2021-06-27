@@ -1,8 +1,13 @@
 <template>
-  <div class="d-flex justify-content-center align-items-center my-5">
-    <span class="h1 player1 text-truncate">{{ player1 || "Player 1 ?" }}</span>
-    <span class="h2 px-5">vs</span>
-    <span class="h1 player2 text-truncate">{{ player2 || "Player 2 ?" }}</span>
+  <div class="mt-4 mb-5">
+    <div class="d-flex justify-content-center align-items-center">
+      <span class="h1 player1 text-truncate">{{ player1 || "???" }}</span>
+      <span class="h2 px-5">vs</span>
+      <span class="h1 player2 text-truncate">{{ player2 || "???" }}</span>
+    </div>
+    <div class="d-flex justify-content-center">
+      <hr style="width: 630px; margin:0;" />
+    </div>
   </div>
 </template>
 
@@ -21,12 +26,12 @@ export default {
   color: #4169e1;
   text-transform: uppercase;
   text-align: right;
-  width: 270px;
+  width: 250px;
 }
 .player2 {
   color: #ff4500;
   text-transform: uppercase;
   text-align: left;
-  width: 270px;
+  width: 250px;
 }
 </style>

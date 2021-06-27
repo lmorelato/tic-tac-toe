@@ -1,8 +1,10 @@
 <template>
   <div class="d-flex justify-content-center">
     <div class="logs">
-      <div class="px-3 pt-1"> /* TIC-TAC-TOE GAME LOG ********************************/ </div>
-      <div class="line px-3 pt-1 symbol-x">game log</div>
+      <div class="px-3 pt-1">===========================</div>
+      <div class="px-3">== TIC-TAC-TOE GAME LOGS ==</div>
+      <div class="px-3 pb-1">===========================</div>
+      <div class="line px-3 pt- ml-1 symbol-x">game log</div>
       <div class="line px-3 pt-1 symbol-o">game log</div>
       <div class="line px-3 pt-1">game log</div>
       <div class="line px-3 pt-1">game log</div>

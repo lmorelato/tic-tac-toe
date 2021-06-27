@@ -88,8 +88,17 @@ export default {
     onGameJoined: function (gameInfo) {
       this.player2 = gameInfo.name;
       this.sessionId = gameInfo.sessionId;
-      this.hideAlert();
+      this.showAlertMessage(
+        "A new player has joined the game!",
+        "warning"
+      );
     },
+  },
+  mounted() {
+   this.showAlertMessage(
+        "Start playing by hosting a game or join an existing one!",
+        "dark"
+      );
   },
 };
 </script>
