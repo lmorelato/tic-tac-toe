@@ -22,8 +22,6 @@
 </template>
 
 <script>
-import Vue from "vue";
-
 export default {
   name: "GameBoard",
   data: function () {
@@ -36,7 +34,7 @@ export default {
   },
   methods: {
     play: function (index) {
-      Vue.set(this.board, index, index % 2 == 0 ? "O" : "X");
+      this.$set(this.board, index, index % 2 == 0 ? "O" : "X");
     },
   },
   beforeMount() {
@@ -50,13 +48,13 @@ export default {
 
 <style scoped>
 .board {
-  width: 300px;
+  width: 330px;
 }
 
 .board-cell {
-  height: 100px;
-  border-bottom: 4px solid #000;
-  border-right: 4px solid #000;
+  height: 110px;
+  border-bottom: 5px solid #000;
+  border-right: 5px solid #000;
   cursor: pointer;
 }
 
@@ -69,14 +67,14 @@ export default {
 }
 
 .symbol-x {
-  width: 90px;
-  height: 90px;
+  width: 110px;
+  height: 110px;
   color: #4169E1;
 }
 
 .symbol-o {
-  width: 52px;
-  height: 52px;
+  width: 60px;
+  height: 60px;
   color: #FF4500;
 }
 </style>
