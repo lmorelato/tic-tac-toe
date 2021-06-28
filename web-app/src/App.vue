@@ -124,10 +124,12 @@ export default {
 
       this.restApi.getGame(gameInfo.sessionId).then((response) => {
         if (!response.data) {
+          this.reset();
           this.showAlertMessage(`Game not found.`, "danger");
           return;
         }
         if (response.data.player2.name) {
+          this.reset();
           this.showAlertMessage(
             `This game cannot be joined, it has 2 players already.`,
             "danger"
@@ -231,6 +233,8 @@ export default {
       }
     },
     reset() {
+      this.game.player1.name = null;
+      this.game.player2.name = null;
       this.$refs.boardComponent.reset();
       this.$refs.logsComponent.reset();
     },

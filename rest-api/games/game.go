@@ -91,6 +91,13 @@ func (g *Game) SetPlayer2(name string) {
 
 // adds a new move and check the board for a winner or a tie
 func (g *Game) Play(symbol string, index int) {
+	// checks if the current symbol is the one we are expecting
+	// otherwise we do not allow this move
+	if g.NextSymbol != symbol {
+		log.Println("Move not allowed, expected symbol", g.NextSymbol)
+		return
+	}
+
 	// if we have a winner we don't need to do anything
 	if g.Winner.Name != "" {
 		log.Println("This game is already over!")
