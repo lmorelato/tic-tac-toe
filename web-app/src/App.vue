@@ -124,10 +124,7 @@ export default {
 
       this.restApi.getGame(gameInfo.sessionId).then((response) => {
         if (!response.data) {
-          this.showAlertMessage(
-            `Game not found.`,
-            "danger"
-          );
+          this.showAlertMessage(`Game not found.`, "danger");
           return;
         }
         if (response.data.player2.name) {
@@ -206,13 +203,16 @@ export default {
     checkWinner(noWinner) {
       if (noWinner && this.game.winner.name != "") {
         if (this.game.winner.name == "NO_WINNER") {
-          this.showAlertMessage(`Oh no! It is a tie!`, "info");
+          this.showAlertMessage(
+            `Oh no! It is a tie... Let's play again! =)`,
+            "info"
+          );
           this.addLog(`It is a tie.`);
         } else {
           if (this.game.winner.symbol == this.playerSymbol) {
-            this.showAlertMessage(`You Win!`, "success");
+            this.showAlertMessage(`You Win! =)`, "success");
           } else {
-            this.showAlertMessage(`You Lose!`, "danger");
+            this.showAlertMessage(`You Lose! =(`, "danger");
           }
           this.addLog(`${this.game.winner.name} won the game!`);
         }
