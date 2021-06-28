@@ -53,7 +53,6 @@ func commonMiddleware(next http.Handler) http.Handler {
 
 func getAllGames(w http.ResponseWriter, r *http.Request) {
 	log.Println("Endpoint Hit: getAllGames")
-
 	json.NewEncoder(w).Encode(gamesMapper.ToList())
 }
 
