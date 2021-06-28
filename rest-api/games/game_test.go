@@ -64,7 +64,7 @@ func TestPlay_NoWinner(t *testing.T) {
 	g.Play(SYMBOL_X, 8)
 
 	// assert
-	if g.Winner != NO_WINNER {
+	if g.Winner.Name != NO_WINNER {
 		t.Errorf("Expected %s, but got %s", NO_WINNER, g.Winner)
 	}
 }
@@ -84,7 +84,7 @@ func TestPlay_Player1Wins(t *testing.T) {
 	g.Play(SYMBOL_X, 8)
 
 	// assert
-	if g.Winner != player1 {
+	if g.Winner.Name != player1 {
 		t.Errorf("Expected %s, but got %s", NO_WINNER, g.Winner)
 	}
 }
@@ -105,7 +105,7 @@ func TestPlay_Player2Wins(t *testing.T) {
 	g.Play(SYMBOL_O, 5)
 
 	// assert
-	if g.Winner != player2 {
+	if g.Winner.Name != player2 {
 		t.Errorf("Expected %s, but got %s", NO_WINNER, g.Winner)
 	}
 }

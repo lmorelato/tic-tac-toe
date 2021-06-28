@@ -8,14 +8,15 @@ import (
 )
 
 type Game struct {
-	SessionId string    `json:"sessionId"`
-	Player1   Player    `json:"player1"`
-	Player2   Player    `json:"player2"`
-	Moves     [9]string `json:"moves"`
-	Logs      []Log     `json:"logs"`
-	Start     time.Time `json:"start"`
-	Duration  int64     `json:"duration"`
-	Winner    string    `json:"winner"`
+	SessionId   string    `json:"sessionId"`
+	Player1     Player    `json:"player1"`
+	Player2     Player    `json:"player2"`
+	Moves       [9]string `json:"moves"`
+	Logs        []Log     `json:"logs"`
+	Start       time.Time `json:"start"`
+	Duration    int64     `json:"duration"`
+	Winner      Player    `json:"winner"`
+	WinningPath [3]int    `json:"winningPath"`
 }
 
 type Player struct {
@@ -92,7 +93,7 @@ func (g *Game) SetPlayer2(name string) {
 // adds a new move and check the board for a winner or a tie
 func (g *Game) Play(symbol string, index int) {
 	// if we have a winner we don't need to do anything
-	if g.Winner != "" {
+	if g.Winner.Name != "" {
 		log.Println("This game is already over!")
 		return
 	}
@@ -101,11 +102,11 @@ func (g *Game) Play(symbol string, index int) {
 	g.addPlayerMove(index, name, symbol)
 
 	if g.checkWinner(symbol) {
-		g.setWinner(name)
+		g.setWinner(name, symbol)
 	} else if len(g.Logs) == 9 {
 		// if we have 9 moves and no winner so it is a tie!
 		log.Println("Oh no it is a tie!")
-		g.setWinner(NO_WINNER)
+		g.setWinner(NO_WINNER, "")
 	}
 }
 
@@ -135,7 +136,7 @@ func (g *Game) addPlayerMove(index int, name string, symbol string) {
 	log.Println("New game move:", l)
 }
 
-func (g Game) checkWinner(symbol string) bool {
+func (g *Game) checkWinner(symbol string) bool {
 	log.Println("Looking for a winner")
 
 	// if we have less than 5 moves we don't have any winner yet
@@ -150,6 +151,7 @@ func (g Game) checkWinner(symbol string) bool {
 			g.Moves[p[1]] == symbol &&
 			g.Moves[p[2]] == symbol {
 			log.Println("Wining path found for symbol", symbol, p)
+			g.WinningPath = p
 			return true
 		}
 	}
@@ -158,10 +160,10 @@ func (g Game) checkWinner(symbol string) bool {
 	return false
 }
 
-func (g *Game) setWinner(name string) {
+func (g *Game) setWinner(name string, symbol string) {
 	// logs the elapsed since the start of the game
 	(*g).Duration = time.Since(g.Start).Milliseconds()
-	(*g).Winner = name
+	(*g).Winner = Player{Name: name, Symbol: symbol}
 
 	log.Println("The winner is", g.Winner)
 	log.Println("Game duration", g.Duration)

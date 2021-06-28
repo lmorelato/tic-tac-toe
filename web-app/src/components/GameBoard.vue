@@ -11,11 +11,26 @@
           align-items-center
           justify-content-center
         "
-        @click="play(index)"
+        :style="{
+          cursor:
+            gameOver || playerSymbol == '' || board[index] != ''
+              ? 'default'
+              : 'pointer',
+        }"
+        @click="play(index, playerSymbol, true)"
       >
-        <b-icon v-if="item == 'X'" class="symbol-x" icon="x"></b-icon>
-        <b-icon v-if="item == 'O'" class="symbol-o" icon="circle"></b-icon>
-        <!-- animation="throb" -->
+        <b-icon
+          v-if="item == 'X'"
+          class="symbol-x"
+          icon="x"
+          :animation="checkWinningPath(index)"
+        ></b-icon>
+        <b-icon
+          v-if="item == 'O'"
+          class="symbol-o"
+          icon="circle"
+          :animation="checkWinningPath(index)"
+        ></b-icon>
       </div>
     </div>
   </div>
@@ -26,22 +41,42 @@ export default {
   name: "GameBoard",
   data: function () {
     return {
-      board: new Array(),
+      board: null,
     };
   },
   props: {
-    msg: String,
+    playerSymbol: String,
+    gameOver: Boolean,
+    winningPath: Array,
   },
   methods: {
-    play: function (index) {
-      this.$set(this.board, index, index % 2 == 0 ? "O" : "X");
+    play: function (index, playerSymbol, emit) {
+      if (!this.gameOver && playerSymbol != "" && this.board[index] == "") {
+        this.$set(this.board, index, playerSymbol);
+        this.$emit("logAdded", {index: index, symbol: playerSymbol});
+
+        if (emit) {
+          this.$emit("boardClicked", index);
+        }
+      }
+    },
+    checkWinningPath(index) {
+      return this.winningPath[0] != this.winningPath[1] &&
+        this.winningPath.includes(index)
+        ? "fade"
+        : "none";
+    },
+    reset() {
+      const boardSize = 9;
+      this.board = new Array();
+
+      for (let index = 0; index < boardSize; index++) {
+        this.board.push("");
+      }
     },
   },
   beforeMount() {
-    const boardSize = 9;
-    for (let index = 0; index < boardSize; index++) {
-      this.board.push("");
-    }
+    this.reset();
   },
 };
 </script>
@@ -55,7 +90,6 @@ export default {
   height: 110px;
   border-bottom: 5px solid #000;
   border-right: 5px solid #000;
-  cursor: pointer;
 }
 
 .board-cell:nth-child(n + 7) {
@@ -69,12 +103,12 @@ export default {
 .symbol-x {
   width: 110px;
   height: 110px;
-  color: #4169E1;
+  color: #4169e1;
 }
 
 .symbol-o {
   width: 60px;
   height: 60px;
-  color: #FF4500;
+  color: #ff4500;
 }
 </style>

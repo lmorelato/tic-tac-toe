@@ -1,17 +1,15 @@
 <template>
   <div class="d-flex justify-content-center">
     <div class="logs">
-      <div class="px-3 py-3 title"> /* GAME LOGS *****************************************/</div>
+      <div class="px-3 py-3 title">
+        /* GAME LOG ******************************************/
+      </div>
       <div
         v-for="(item, index) in logs"
         :key="index"
-        class="line px-3 pt- ml-1 symbol-x"
-        :class="{
-          'symbol-x': item.symbol == 'X',
-          'symbol-o': item.symbol == 'O',
-        }"
+        class="line px-3 pt- ml-1"
       >
-        {{ logs.length - index }}- {{ item.text }}
+        {{ logs.length - index }}- {{ item }}
       </div>
     </div>
   </div>
@@ -29,6 +27,9 @@ export default {
     addLog(log) {
       this.logs.unshift(log);
     },
+    reset() {
+      this.logs = new Array();
+    },
   },
 };
 </script>
@@ -44,13 +45,6 @@ export default {
   font-family: "Courier New", Courier, monospace;
   font-weight: 600;
   background-color: #fcfcfc;
-}
-
-.symbol-x {
-  color: #4169e1;
-}
-.symbol-o {
-  color: #ff4500;
 }
 
 .title {

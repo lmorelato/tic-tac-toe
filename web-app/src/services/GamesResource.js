@@ -5,6 +5,14 @@ export default class GamesResource {
     this.api = "/games";
   }
 
+  getAllGames() {
+    return axios.get(this.api);
+  }
+
+  getGame(sessionId) {
+    return axios.get(`${this.api}/${sessionId}`);
+  }
+
   newGame(playerName) {
     return axios.post(this.api, { name: playerName });
   }

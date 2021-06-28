@@ -19,7 +19,14 @@
 
       <div class="row">
         <div class="col mt-2">
-          <GameBoard />
+          <GameBoard
+            ref="boardComponent"
+            :playerSymbol="playerSymbol"
+            :gameOver="this.game.winner.symbol != ''"
+            :winningPath="this.game.winningPath"
+            @boardClicked="onBoardClicked"
+            @logAdded="onLogAdded"
+          />
         </div>
         <div class="col">
           <Logs ref="logsComponent" />
@@ -62,7 +69,12 @@ export default {
           name: null,
           symbol: "O",
         },
-        winner: "",
+        moves: [],
+        winner: {
+          name: null,
+          symbol: null,
+        },
+        winningPath: [],
       },
       restApi: new GamesResource(),
       modalShow: false,
@@ -70,6 +82,9 @@ export default {
       alertShow: false,
       alertMessage: "",
       alertVariant: "",
+      playerName: "",
+      playerSymbol: "",
+      polling: null,
     };
   },
   methods: {
@@ -87,49 +102,120 @@ export default {
     joinGame: function () {
       this.$refs.launchGameComponent.show("JOIN_GAME");
     },
-    addLog(text, symbol) {
-      this.$refs.logsComponent.addLog({
-        symbol: symbol == null ? "X" : "O",
-        text: `${this.game.player1.name} has started a new game: ${this.game.sessionId}`,
-      });
+    addLog(text) {
+      this.$refs.logsComponent.addLog(text);
     },
     onGameStarted: function (gameInfo) {
+      this.$refs.boardComponent.reset();
+      this.$refs.logsComponent.reset();
+      this.playerSymbol = "X";
+      this.playerName = gameInfo.name;
+
       this.restApi.newGame(gameInfo.name).then((response) => {
         this.game = response.data;
+        this.initPooling();
 
         this.showAlertMessage(
           `Invite someone to start playing sharing this game code: <span class='h4 mx-1'>${this.game.sessionId}</span>`,
           "info"
         );
-
         this.addLog(
           `${this.game.player1.name} has started a new game: ${this.game.sessionId}`
         );
       });
     },
     onGameJoined: function (gameInfo) {
+      this.$refs.boardComponent.reset();
+      this.$refs.logsComponent.reset();
+      this.playerSymbol = "O";
+      this.playerName = gameInfo.name;
+
       this.restApi
         .joinGame(gameInfo.sessionId, gameInfo.name)
         .then((response) => {
           this.game = response.data;
-          console.log(this.game);
+          this.initPooling();
+
           this.showAlertMessage(
             `${this.game.player2.name} has joined the game!`,
             "warning"
           );
-
-          this.addLog(`${this.game.player2.name} has joined the game`, "O");
           this.addLog(
             `${this.game.player1.name} has started a new game: ${this.game.sessionId}`
           );
+          this.addLog(`${this.game.player2.name} has joined the game`, "O");
         });
     },
+    onBoardClicked: function (index) {
+      this.restApi.play(this.game.sessionId, index, this.playerSymbol);
+    },
+    onLogAdded: function (log) {
+      this.addLog(`Position ${log.index + 1}, Symbol: ${log.symbol}`);
+    },
+    initPooling() {
+      if (this.polling) return;
+
+      this.polling = setInterval(() => {
+        if (this.game.sessionId) {
+          this.restApi.getGame(this.game.sessionId).then((response) => {
+            var noPlayer2 = this.game.player2.name == "";
+            var noWinner = this.game.winner.symbol == "";
+            this.game = response.data;
+
+            this.checkPlayer2(noPlayer2);
+            this.fillBoard();
+            this.checkWinner(noWinner);
+          });
+        }
+      }, 2000);
+    },
+    fillBoard() {
+      for (let index = 0; index < this.game.moves.length; index++) {
+        if (
+          this.game.moves[index] != "" &&
+          this.game.moves[index] != this.playerSymbol
+        ) {
+          let symbol = this.playerSymbol == "X" ? "O" : "X";
+          this.$refs.boardComponent.play(index, symbol, false);
+        }
+      }
+    },
+    checkPlayer2(noPlayer2) {
+      let hasPlayer2 = noPlayer2 && this.game.player2.name != "";
+      if (hasPlayer2) {
+        this.showAlertMessage(
+          `${this.game.player2.name} has joined the game!`,
+          "warning"
+        );
+        this.addLog(`${this.game.player2.name} has joined the game`, "O");
+      }
+    },
+    checkWinner(noWinner) {
+      if (noWinner && this.game.winner.symbol != "") {
+        if (this.game.winner.symbol == this.playerSymbol) {
+          this.showAlertMessage(`You Win!`, "success");
+        } else {
+          this.showAlertMessage(`You Lose!`, "danger");
+        }
+
+        this.addLog(`${this.game.winner.name} won the game!`);
+
+        clearInterval(this.polling);
+        this.polling = null;
+      }
+    },
+  },
+  created() {
+    this.initPooling();
   },
   mounted() {
     this.showAlertMessage(
       "Tip: Start playing by hosting a game or join an existing one!",
       "dark"
     );
+  },
+  beforeDestroy() {
+    clearInterval(this.polling);
   },
 };
 </script>
