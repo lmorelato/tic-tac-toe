@@ -1,5 +1,6 @@
 # Tic-Tac-Toe game
 A basic tic-tac-toe game developed in golang and vue.js v2. 
+
 This game allows two users to play together on different machines.
 
 ## Game flow
