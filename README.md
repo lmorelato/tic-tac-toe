@@ -14,7 +14,7 @@ You should have golang, vue cli and node installed on your system.
 * Running the backend rest api, go to the root app folder:
 
 ```
-cd tic-tac-toe\web-app
+cd web-app
 go run .\main.go
 ```
 
@@ -27,7 +27,7 @@ go test
 
 * Running the frontend:
 ```
-cd tic-tac-toe\rest-api
+cd rest-api
 npm i
 npm run serve 
 ```

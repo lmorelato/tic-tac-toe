@@ -52,12 +52,7 @@ import GamesResource from "./services/GamesResource.js";
 
 export default {
   name: "App",
-  components: {
-    GameBoard,
-    PlayersInfo,
-    LaunchGameModal,
-    Logs,
-  },
+  components: { GameBoard, PlayersInfo, LaunchGameModal, Logs },
   data: function () {
     return {
       game: {
@@ -84,7 +79,6 @@ export default {
       alertShow: false,
       alertMessage: "",
       alertVariant: "",
-      playerName: "",
       playerSymbol: "",
       polling: null,
     };
@@ -108,10 +102,8 @@ export default {
       this.$refs.logsComponent.addLog(text);
     },
     onGameStarted: function (gameInfo) {
-      this.$refs.boardComponent.reset();
-      this.$refs.logsComponent.reset();
+      this.reset();
       this.playerSymbol = "X";
-      this.playerName = gameInfo.name;
 
       this.restApi.newGame(gameInfo.name).then((response) => {
         this.game = response.data;
@@ -127,26 +119,42 @@ export default {
       });
     },
     onGameJoined: function (gameInfo) {
-      this.$refs.boardComponent.reset();
-      this.$refs.logsComponent.reset();
+      this.reset();
       this.playerSymbol = "O";
-      this.playerName = gameInfo.name;
 
-      this.restApi
-        .joinGame(gameInfo.sessionId, gameInfo.name)
-        .then((response) => {
-          this.game = response.data;
-          this.initPooling();
-
+      this.restApi.getGame(gameInfo.sessionId).then((response) => {
+        if (!response.data) {
           this.showAlertMessage(
-            `${this.game.player2.name} has joined the game!`,
-            "warning"
+            `Game not found.`,
+            "danger"
           );
-          this.addLog(
-            `${this.game.player1.name} has started a new game: ${this.game.sessionId}`
+          return;
+        }
+        if (response.data.player2.name) {
+          this.showAlertMessage(
+            `This game cannot be joined, it has 2 players already.`,
+            "danger"
           );
-          this.addLog(`${this.game.player2.name} has joined the game`, "O");
-        });
+          return;
+        }
+
+        this.restApi
+          .joinGame(gameInfo.sessionId, gameInfo.name)
+          .then((response) => {
+            this.game = response.data;
+
+            this.showAlertMessage(
+              `${this.game.player2.name} has joined the game!`,
+              "warning"
+            );
+            this.addLog(
+              `${this.game.player1.name} has started a new game: ${this.game.sessionId}`
+            );
+            this.addLog(`${this.game.player2.name} has joined the game`, "O");
+          });
+
+        this.initPooling();
+      });
     },
     onBoardClicked: function (index) {
       this.restApi.play(this.game.sessionId, index, this.playerSymbol);
@@ -162,19 +170,9 @@ export default {
           this.restApi.getGame(this.game.sessionId).then((response) => {
             var noPlayer2 = this.game.player2.name == "";
             var noWinner = this.game.winner.symbol == "";
+
             this.game = response.data;
-
-            if (!noPlayer2 && noWinner) {
-              if (this.game.nextSymbol == this.playerSymbol) {
-                this.showAlertMessage(`It is your turn, let's play!`, "info");
-              } else {
-                this.showAlertMessage(
-                  `Waiting for the other player...`,
-                  "warning"
-                );
-              }
-            }
-
+            this.checkTurn(noPlayer2, noWinner);
             this.checkPlayer2(noPlayer2);
             this.fillBoard();
             this.checkWinner(noWinner);
@@ -183,6 +181,7 @@ export default {
       }, 500);
     },
     fillBoard() {
+      // update the board with the other player moves
       for (let index = 0; index < this.game.moves.length; index++) {
         if (
           this.game.moves[index] != "" &&
@@ -194,6 +193,7 @@ export default {
       }
     },
     checkPlayer2(noPlayer2) {
+      // check if plyear 2 joined the game
       let hasPlayer2 = noPlayer2 && this.game.player2.name != "";
       if (hasPlayer2) {
         this.showAlertMessage(
@@ -204,18 +204,35 @@ export default {
       }
     },
     checkWinner(noWinner) {
-      if (noWinner && this.game.winner.symbol != "") {
-        if (this.game.winner.symbol == this.playerSymbol) {
-          this.showAlertMessage(`You Win!`, "success");
+      if (noWinner && this.game.winner.name != "") {
+        if (this.game.winner.name == "NO_WINNER") {
+          this.showAlertMessage(`Oh no! It is a tie!`, "info");
+          this.addLog(`It is a tie.`);
         } else {
-          this.showAlertMessage(`You Lose!`, "danger");
+          if (this.game.winner.symbol == this.playerSymbol) {
+            this.showAlertMessage(`You Win!`, "success");
+          } else {
+            this.showAlertMessage(`You Lose!`, "danger");
+          }
+          this.addLog(`${this.game.winner.name} won the game!`);
         }
-
-        this.addLog(`${this.game.winner.name} won the game!`);
 
         clearInterval(this.polling);
         this.polling = null;
       }
+    },
+    checkTurn(noPlayer2, noWinner) {
+      if (!noPlayer2 && noWinner) {
+        if (this.game.nextSymbol == this.playerSymbol) {
+          this.showAlertMessage(`It is your turn, let's play!`, "info");
+        } else {
+          this.showAlertMessage(`Waiting for the other player...`, "warning");
+        }
+      }
+    },
+    reset() {
+      this.$refs.boardComponent.reset();
+      this.$refs.logsComponent.reset();
     },
   },
   created() {

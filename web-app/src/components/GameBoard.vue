@@ -52,6 +52,7 @@ export default {
   },
   methods: {
     play: function (index, playerSymbol, emit, forceFill) {
+      // forceFill is used to set the other player moves on log area
       if (
         !this.gameOver &&
         this.board[index] == "" &&
@@ -60,12 +61,14 @@ export default {
         this.$set(this.board, index, playerSymbol);
         this.$emit("addBoardLog", { index: index, symbol: playerSymbol });
 
+        // only emit when is clicked by the current user
         if (emit) {
           this.$emit("boardClicked", index);
         }
       }
     },
     checkWinningPath(index) {
+      // lets animate the winning path!
       return this.winningPath[0] != this.winningPath[1] &&
         this.winningPath.includes(index)
         ? "fade"
