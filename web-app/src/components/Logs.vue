@@ -1,20 +1,18 @@
 <template>
   <div class="d-flex justify-content-center">
     <div class="logs">
-      <div class="px-3 pt-1">===========================</div>
-      <div class="px-3">== TIC-TAC-TOE GAME LOGS ==</div>
-      <div class="px-3 pb-1">===========================</div>
-      <div class="line px-3 pt- ml-1 symbol-x">game log</div>
-      <div class="line px-3 pt-1 symbol-o">game log</div>
-      <div class="line px-3 pt-1">game log</div>
-      <div class="line px-3 pt-1">game log</div>
-      <div class="line px-3 pt-1">game log</div>
-      <div class="line px-3 pt-1">game log</div>
-      <div class="line px-3 pt-1">game log</div>
-      <div class="line px-3 pt-1">game log</div>
-      <div class="line px-3 pt-1">game log</div>
-      <div class="line px-3 pt-1">game log</div>
-
+      <div class="px-3 py-3 title"> /* GAME LOGS *****************************************/</div>
+      <div
+        v-for="(item, index) in logs"
+        :key="index"
+        class="line px-3 pt- ml-1 symbol-x"
+        :class="{
+          'symbol-x': item.symbol == 'X',
+          'symbol-o': item.symbol == 'O',
+        }"
+      >
+        {{ logs.length - index }}- {{ item.text }}
+      </div>
     </div>
   </div>
 </template>
@@ -22,9 +20,15 @@
 <script>
 export default {
   name: "Logs",
-  props: {
-    player1: { type: String, default: null },
-    player2: { type: String, default: null },
+  data: function () {
+    return {
+      logs: new Array(),
+    };
+  },
+  methods: {
+    addLog(log) {
+      this.logs.unshift(log);
+    },
   },
 };
 </script>
@@ -39,15 +43,7 @@ export default {
   text-align: left;
   font-family: "Courier New", Courier, monospace;
   font-weight: 600;
-  background-color: #F8F8F8;
-}
-
-.line::before {
-  content: "";
-}
-
-.line::after {
-  content: "...";
+  background-color: #fcfcfc;
 }
 
 .symbol-x {
@@ -55,5 +51,9 @@ export default {
 }
 .symbol-o {
   color: #ff4500;
+}
+
+.title {
+  font-size: 105%;
 }
 </style>

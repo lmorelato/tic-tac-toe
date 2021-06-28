@@ -7,32 +7,48 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 var gamesMapper GamesMap
 
 func HandleRequests() {
 	gamesMapper = make(GamesMap)
-	apiRouter := mux.NewRouter().StrictSlash(true)
+	muxRouter := mux.NewRouter().StrictSlash(true)
+	muxRouter.Use(commonMiddleware)
 
 	log.Println("Creating routes")
-	apiRouter.HandleFunc(API_GAMES, getAllGames).Methods("GET")
 	log.Println("GET: ", API_GAMES)
-
-	apiRouter.HandleFunc(API_GAMES+"/{sessionId}", getSingleGame).Methods("GET")
 	log.Println("GET: ", API_GAMES+"/{sessionId}")
-
-	apiRouter.HandleFunc(API_GAMES, createNewGame).Methods("POST")
 	log.Println("POST: ", API_GAMES)
-
-	apiRouter.HandleFunc(API_GAMES+"/join/{sessionId}", joinGame).Methods("PUT")
 	log.Println("PUT: ", API_GAMES+"/join/{sessionId}")
-
-	apiRouter.HandleFunc(API_GAMES+"/play/{sessionId}", playGame).Methods("PUT")
 	log.Println("PUT: ", API_GAMES+"/play/{sessionId}")
 
+	muxRouter.HandleFunc(API_GAMES, getAllGames).Methods("GET")
+	muxRouter.HandleFunc(API_GAMES+"/{sessionId}", getSingleGame).Methods("GET")
+	muxRouter.HandleFunc(API_GAMES, createNewGame).Methods("POST")
+	muxRouter.HandleFunc(API_GAMES+"/join/{sessionId}", joinGame).Methods("PUT")
+	muxRouter.HandleFunc(API_GAMES+"/play/{sessionId}", playGame).Methods("PUT")
+
+	// Setting CORS (not for production!)
+	c := cors.New(cors.Options{
+		AllowedMethods: []string{
+			http.MethodGet,
+			http.MethodPost,
+			http.MethodPut,
+			http.MethodOptions},
+	})
+	handler := c.Handler(muxRouter)
+
+	log.Fatalln(http.ListenAndServe(API_PORT, handler))
 	log.Println("Listening to the", API_PORT, "port")
-	log.Fatalln(http.ListenAndServe(API_PORT, apiRouter))
+}
+
+func commonMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		next.ServeHTTP(w, r)
+	})
 }
 
 func getAllGames(w http.ResponseWriter, r *http.Request) {
