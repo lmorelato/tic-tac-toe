@@ -8,7 +8,8 @@ This game allows two users to play together on different machines.
 * Player 2 join the game using the shared code.
 * The players keep on playing until someone is the winner or we have a tie.
 
-![game flow(https://github.com/lmorelato/tic-tac-toe/blob/main/images/tic-tac-toe.gif "Game Flow")
+![game flow](https://github.com/lmorelato/tic-tac-toe/blob/main/images/tic-tac-toe.gif "Game Flow")
+
 
 ## Installation
 You should have golang, vue cli and node installed on your system.
