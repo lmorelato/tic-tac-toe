@@ -240,7 +240,7 @@ export default {
   },
   mounted() {
     this.showAlertMessage(
-      "Tip: Start playing by hosting a game or join an existing one!",
+      "Tip: Start playing by hosting a game or joining an existing one!",
       "dark"
     );
   },

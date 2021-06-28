@@ -34,3 +34,12 @@ cd rest-api
 npm i
 npm run serve 
 ```
+
+## API Endpoints
+* Get All Games - GET:  /api/games
+* Get Single Game - GET:  /api/games/{sessionId}     
+* Create New Game - POST:  /api/games
+* Play Game - PUT:  /api/games/join/{sessionId}
+* Join Game - PUT:  /api/games/play/{sessionId}
+
+A postman config file can be found [here](https://link-url-here.org) to help with api tests.
