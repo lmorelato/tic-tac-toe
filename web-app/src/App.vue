@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="mb-5">
     <div class="mb-4">
       <b-navbar type="dark" variant="dark">
         <b-navbar-nav>
@@ -24,6 +24,7 @@
             :playerSymbol="playerSymbol"
             :gameOver="this.game.winner.symbol != ''"
             :winningPath="this.game.winningPath"
+            :nextSymbol="this.game.nextSymbol"
             @boardClicked="onBoardClicked"
             @logAdded="onLogAdded"
           />
@@ -75,6 +76,7 @@ export default {
           symbol: null,
         },
         winningPath: [],
+        nextSymbol: "",
       },
       restApi: new GamesResource(),
       modalShow: false,
@@ -162,12 +164,23 @@ export default {
             var noWinner = this.game.winner.symbol == "";
             this.game = response.data;
 
+            if (!noPlayer2 && noWinner) {
+              if (this.game.nextSymbol == this.playerSymbol) {
+                this.showAlertMessage(`It is your turn, let's play!`, "info");
+              } else {
+                this.showAlertMessage(
+                  `Waiting for the other player...`,
+                  "warning"
+                );
+              }
+            }
+
             this.checkPlayer2(noPlayer2);
             this.fillBoard();
             this.checkWinner(noWinner);
           });
         }
-      }, 2000);
+      }, 500);
     },
     fillBoard() {
       for (let index = 0; index < this.game.moves.length; index++) {
@@ -176,7 +189,7 @@ export default {
           this.game.moves[index] != this.playerSymbol
         ) {
           let symbol = this.playerSymbol == "X" ? "O" : "X";
-          this.$refs.boardComponent.play(index, symbol, false);
+          this.$refs.boardComponent.play(index, symbol, false, true);
         }
       }
     },

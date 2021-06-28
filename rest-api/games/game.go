@@ -17,6 +17,7 @@ type Game struct {
 	Duration    int64     `json:"duration"`
 	Winner      Player    `json:"winner"`
 	WinningPath [3]int    `json:"winningPath"`
+	NextSymbol  string    `json:"nextSymbol"`
 }
 
 type Player struct {
@@ -58,9 +59,10 @@ var winningPaths = [8][3]int{
 // adds basic info to start the game
 func NewGame(name string) Game {
 	g := Game{
-		SessionId: newSessionId(),
-		Player1:   Player{Name: name, Symbol: SYMBOL_X},
-		Start:     time.Now(),
+		SessionId:  newSessionId(),
+		Player1:    Player{Name: name, Symbol: SYMBOL_X},
+		Start:      time.Now(),
+		NextSymbol: "X",
 	}
 
 	log.Println("New game created: ", g)
@@ -123,6 +125,11 @@ func (g Game) getPlayerNameBySymbol(symbol string) string {
 
 func (g *Game) addPlayerMove(index int, name string, symbol string) {
 	(*g).Moves[index] = symbol
+
+	(*g).NextSymbol = SYMBOL_X
+	if symbol == SYMBOL_X {
+		(*g).NextSymbol = SYMBOL_O
+	}
 
 	// logging the move
 	l := Log{

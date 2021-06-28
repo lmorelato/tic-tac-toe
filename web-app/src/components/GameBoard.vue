@@ -17,7 +17,7 @@
               ? 'default'
               : 'pointer',
         }"
-        @click="play(index, playerSymbol, true)"
+        @click="play(index, playerSymbol, true, false)"
       >
         <b-icon
           v-if="item == 'X'"
@@ -48,12 +48,17 @@ export default {
     playerSymbol: String,
     gameOver: Boolean,
     winningPath: Array,
+    nextSymbol: String,
   },
   methods: {
-    play: function (index, playerSymbol, emit) {
-      if (!this.gameOver && playerSymbol != "" && this.board[index] == "") {
+    play: function (index, playerSymbol, emit, forceFill) {
+      if (
+        !this.gameOver &&
+        this.board[index] == "" &&
+        (forceFill || playerSymbol == this.nextSymbol)
+      ) {
         this.$set(this.board, index, playerSymbol);
-        this.$emit("logAdded", {index: index, symbol: playerSymbol});
+        this.$emit("logAdded", { index: index, symbol: playerSymbol });
 
         if (emit) {
           this.$emit("boardClicked", index);
