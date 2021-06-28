@@ -25,8 +25,8 @@
             :gameOver="this.game.winner.symbol != ''"
             :winningPath="this.game.winningPath"
             :nextSymbol="this.game.nextSymbol"
+            @addBoardLog="onAddBoardLog"
             @boardClicked="onBoardClicked"
-            @logAdded="onLogAdded"
           />
         </div>
         <div class="col">
@@ -151,7 +151,7 @@ export default {
     onBoardClicked: function (index) {
       this.restApi.play(this.game.sessionId, index, this.playerSymbol);
     },
-    onLogAdded: function (log) {
+    onAddBoardLog: function (log) {
       this.addLog(`Position ${log.index + 1}, Symbol: ${log.symbol}`);
     },
     initPooling() {

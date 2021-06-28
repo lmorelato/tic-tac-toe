@@ -58,7 +58,7 @@ export default {
         (forceFill || playerSymbol == this.nextSymbol)
       ) {
         this.$set(this.board, index, playerSymbol);
-        this.$emit("logAdded", { index: index, symbol: playerSymbol });
+        this.$emit("addBoardLog", { index: index, symbol: playerSymbol });
 
         if (emit) {
           this.$emit("boardClicked", index);
