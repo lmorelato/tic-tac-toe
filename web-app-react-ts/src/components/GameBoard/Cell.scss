@@ -1,0 +1,47 @@
+.board-cell {
+  height: 110px;
+  border-bottom: 5px solid #000;
+  border-right: 5px solid #000;
+
+  &:nth-child(n + 7) {
+    border-bottom: 0;
+  }
+
+  &:nth-child(3n) {
+    border-right: 0;
+  }
+
+  .x {
+    width: 110px;
+    height: 110px;
+    color: #4169e1;
+  }
+
+  .o {
+    width: 60px;
+    height: 60px;
+    color: #ff4500;
+  }
+}
+
+.winning-cell {
+  background-color: lightgreen;
+}
+
+.blink-bg {
+  color: #fff;
+  display: inline-block;
+  animation: blinkingBackground 1.2s infinite;
+}
+
+@keyframes blinkingBackground {
+  0% {
+    background-color: #ffffff;
+  }
+  50% {
+    background-color: #b7ecb9;
+  }
+  106% {
+    background-color: #57d25d;
+  }
+}
