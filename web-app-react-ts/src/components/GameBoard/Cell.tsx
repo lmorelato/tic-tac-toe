@@ -1,16 +1,24 @@
 import "./Cell.scss";
 import { BsCircle, BsX } from "react-icons/bs";
 
-const Cell = (props: any) => {
+type CellProps = {
+  index: number;
+  symbol: string;
+  gameOver: boolean;
+  winningPath: number[];
+  onCellClicked: (index: number) => void;
+}; 
+
+const Cell = (props: CellProps) => {
   const index = props.index;
   const isSymbolX = props.symbol === "X";
   const isSymbolO = props.symbol === "O";
   const cursor = !isSymbolX && !isSymbolO ? "pointer" : "default";
-  let className =
-    "col-4 board-cell d-flex align-items-center justify-content-center";
+  let css = "col-4 board-cell d-flex align-items-center justify-content-center";
 
+  // let's animate the winning path
   if (props.gameOver && props.winningPath.indexOf(index) >= 0) {
-    className = className + " blink-bg";
+    css = css + " blink-bg";
   }
 
   const clickHandler = () => {
@@ -18,11 +26,7 @@ const Cell = (props: any) => {
   };
 
   return (
-    <div
-      className={className}
-      style={{ cursor: cursor }}
-      onClick={clickHandler}
-    >
+    <div className={css} style={{ cursor: cursor }} onClick={clickHandler}>
       {isSymbolX && <BsX className="x"></BsX>}
       {isSymbolO && <BsCircle className="o"></BsCircle>}
     </div>

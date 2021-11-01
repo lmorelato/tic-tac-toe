@@ -1,6 +1,11 @@
 import "./Players.scss";
 
-const Players = (props: any) => {
+type PlayersProps = {
+  player1: string;
+  player2: string;
+};
+
+const Players = (props: PlayersProps) => {
   const player1: string = props.player1;
   const player2: string = props.player2;
 
@@ -12,7 +17,7 @@ const Players = (props: any) => {
         <span className="h1 p2 text-truncate">{player2 || "?"}</span>
       </div>
       <div className="d-flex justify-content-center">
-        <hr style={{ width: "630px", margin: 0 }} />
+        <hr style={{ width: "100%", margin: 0 }} />
       </div>
     </div>
   );

@@ -4,7 +4,11 @@ import Collapse from "react-bootstrap/Collapse";
 import Form from "react-bootstrap/Form";
 import { useState } from "react";
 
-const StartGame = (props: any) => {
+type StartGameProps = {
+  onGameLaunched: (playerName: string, sessionId: string) => void;
+};
+
+const StartGame = (props: StartGameProps) => {
   const [startGameMode, setStartGameMode] = useState(false);
   const [joinGameMode, setJoinGameMode] = useState(false);
   const [validated, setValidated] = useState(false);
@@ -43,10 +47,9 @@ const StartGame = (props: any) => {
       return;
     }
 
-    const sessionId = joinGameMode ? form["sessionId"].value: "";
+    const sessionId = joinGameMode ? form["sessionId"].value : "";
     props.onGameLaunched(form["playerName"].value, sessionId);
   };
-
 
   return (
     <div className="d-grid gap-2 w-75">
@@ -58,7 +61,12 @@ const StartGame = (props: any) => {
       </Button>
       <Collapse in={startGameMode || joinGameMode}>
         <div className="my-3">
-          <Form id="gameForm" noValidate validated={validated} onSubmit={submitHandler}>
+          <Form
+            id="gameForm"
+            noValidate
+            validated={validated}
+            onSubmit={submitHandler}
+          >
             <Form.Group className="mb-3" controlId="playerName">
               <Form.Label>Player Name</Form.Label>
               <Form.Control

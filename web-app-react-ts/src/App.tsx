@@ -1,26 +1,28 @@
-import { useState } from "react";
 import "./App.scss";
 import GameBoard from "./components/GameBoard/GameBoard";
 import Logs from "./components/Logs";
 import Players from "./components/Players";
 import StartGame from "./components/StartGame";
 import GamesResource from "./services/GamesResource";
+import { useState } from "react";
 import { Game, GameInitialState } from "./models/Game";
 import { GameInfoInitialState } from "./models/GameInfo";
 import { clone } from "lodash";
 import { useInterval } from "usehooks-ts";
+import { Alert, Button } from "react-bootstrap";
+import { AlertMessageInitialState } from "./models/AlertMessage";
 
 const App = () => {
   const restApi = new GamesResource();
-
+  const emptyStringArray: string[] = [];
   const [game, setGame] = useState(GameInitialState);
   const [gameInfo, setGameInfo] = useState(GameInfoInitialState);
   const [gameStarted, setGameStarted] = useState(false);
-
-  const emptyStringArray: string[] = [];
   const [startGameLogs, setStartGameLogs] = useState(emptyStringArray);
   const [endGameLogs, setEndGameLogs] = useState(emptyStringArray);
+  const [alertMessage, setAlertMessage] = useState(AlertMessageInitialState);
 
+  // hook to enable setinterval, used when auto refreshing screen
   useInterval(
     () => {
       updatePolling();
@@ -34,21 +36,32 @@ const App = () => {
   ) => {
     setGameStarted(true);
 
-    const isNewGame = !sessionId;
+    const isNewGame = !sessionId; // if !isNewGame => joining a game
     gameInfo.playerSymbol = isNewGame ? "X" : "O";
     setGameInfo(gameInfo);
 
-    const response = isNewGame
-      ? await restApi.newGame(playerName)
-      : await restApi.joinGame(sessionId, playerName);
+    try {
+      const response = isNewGame
+        ? await restApi.newGame(playerName)
+        : await restApi.joinGame(sessionId, playerName);
 
-    const gameData = response.data as Game;
-    setGame(gameData);
-
-    logGameStart(gameData, isNewGame);
+      const gameData = response.data as Game;
+      setGame(gameData);
+      logGameStart(gameData, isNewGame);
+    } catch (error) {
+      setAlertMessage({
+        text: "Error trying to start/join a game, please try again.",
+        variant: "danger",
+      });
+    }
   };
 
   const logGameStart = (gameData: Game, isNewGame: boolean) => {
+    setAlertMessage({
+      text: `Invite someone to start playing sharing this game code: ${gameData.sessionId}`,
+      variant: "info",
+    });
+
     const gameLogs = [
       `${gameData.player1.name.toUpperCase()} has started a new game, Session Id: ${
         gameData.sessionId
@@ -93,20 +106,36 @@ const App = () => {
 
       gameInfo.gameOver = game.winner.symbol !== "";
       setGameInfo(gameInfo);
-
-      //this.checkTurn(noPlayer2, noWinner);
+      checkNextPlayer(gameData, waitingPlayer2, waitingWinner);
       checkPlayer2(gameData, waitingPlayer2);
       checkWinner(gameData, waitingWinner);
+    }
+  };
+
+  const checkNextPlayer = (
+    gameData: Game,
+    waitingPlayer2: boolean,
+    waitingWinner: boolean
+  ) => {
+    if (!waitingPlayer2 && waitingWinner) {
+      if (gameData.nextSymbol === gameInfo.playerSymbol) {
+        setAlertMessage({
+          text: "It is your turn, let's play!",
+          variant: "info",
+        });
+      } else {
+        setAlertMessage({
+          text: "Waiting for the other player...",
+          variant: "warning",
+        });
+      }
     }
   };
 
   const checkPlayer2 = (gameData: Game, waitingPlayer2: boolean) => {
     if (waitingPlayer2 && gameData.player2.name !== "") {
       const joinLog = `${gameData.player2.name.toUpperCase()} has joined the game`;
-      // this.showAlertMessage(
-      //   joinLog,
-      //   "warning"
-      // );
+      setAlertMessage({ text: joinLog, variant: "warning" });
 
       const newStartGameLogs = clone(startGameLogs);
       newStartGameLogs.unshift(joinLog);
@@ -119,65 +148,96 @@ const App = () => {
       const newEndGameLogs = clone(endGameLogs);
 
       if (gameData.winner.name === "NO_WINNER") {
-        // this.showAlertMessage(
-        //   `Oh no! It is a tie... Let's play again! =)`,
-        //   "info"
-        // );
+        setAlertMessage({
+          text: "Oh no! It is a tie... Let's play again! =)",
+          variant: "info",
+        });
+
         newEndGameLogs.push("It is a tie!");
       } else {
         if (gameData.winner.symbol === gameInfo.playerSymbol) {
-          // this.showAlertMessage(`You Win! =)`, "success");
+          setAlertMessage({ text: "You Win! =)", variant: "success" });
         } else {
-          // this.showAlertMessage(`You Lose! =(`, "danger");
+          setAlertMessage({ text: "You Lose! =(", variant: "danger" });
         }
+
         newEndGameLogs.push(
           `${gameData.winner.name.toUpperCase()} won the game!`
         );
       }
-
       setEndGameLogs(newEndGameLogs);
     }
   };
 
+  const endGame = () => {
+    setGame(GameInitialState);
+    setGameInfo(GameInfoInitialState);
+    setGameStarted(false);
+    setStartGameLogs(emptyStringArray);
+    setEndGameLogs(emptyStringArray);
+    setAlertMessage(AlertMessageInitialState);
+  };
+
   return (
     <div className="App mb-5">
-      <div className="header">
-        Tic-Tac-Toe React - SessionId: {game.sessionId}
-      </div>
+      <div className="header">Tic-Tac-Toe React</div>
 
-      {!gameStarted && (
-        <div className="my-4 mx-5 d-flex justify-content-center">
-          <StartGame onGameLaunched={onGameLaunchedHandler}></StartGame>
-        </div>
-      )}
+      <div className="container">
+        <Alert
+          variant={alertMessage.variant}
+          className="d-flex justify-content-center"
+        >
+          {alertMessage.text}
+        </Alert>
 
-      {gameStarted && (
-        <div className="container">
-          <Players
-            player1={game.player1.name}
-            player2={game.player2.name}
-          ></Players>
-          <div className="row">
-            <div className="col mt-2">
-              <GameBoard
-                board={game.moves}
-                playerSymbol={gameInfo.playerSymbol}
-                nextSymbol={game.nextSymbol}
-                gameOver={gameInfo.gameOver}
-                winningPath={game.winningPath}
-                onBoardClicked={onBoardClickedHandler}
-              ></GameBoard>
+        {!gameStarted && (
+          <div className="my-4 mx-5 d-flex justify-content-center">
+            <StartGame onGameLaunched={onGameLaunchedHandler}></StartGame>
+          </div>
+        )}
+
+        {gameStarted && (
+          <div className="container">
+            <div className="d-flex justify-content-between align-items-center">
+              <Players
+                player1={game.player1.name}
+                player2={game.player2.name}
+              ></Players>
+              <div className="end-game">
+                <Button
+                  className="end-game-button"
+                  size="lg"
+                  variant="primary"
+                  onClick={endGame}
+                >
+                  End Game
+                </Button>
+              </div>
             </div>
-            <div className="col">
-              <Logs
-                logs={game.logs}
-                startGameLogs={startGameLogs}
-                endGameLogs={endGameLogs}
-              ></Logs>
+
+            <div className="row">
+              <div className="col mt-2">
+                <GameBoard
+                  board={game.moves}
+                  playerSymbol={gameInfo.playerSymbol}
+                  nextSymbol={game.nextSymbol}
+                  gameOver={gameInfo.gameOver}
+                  winningPath={game.winningPath}
+                  onBoardClicked={onBoardClickedHandler}
+                ></GameBoard>
+              </div>
+
+              <div className="col">
+                <Logs
+                  logs={game.logs}
+                  startGameLogs={startGameLogs}
+                  endGameLogs={endGameLogs}
+                ></Logs>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

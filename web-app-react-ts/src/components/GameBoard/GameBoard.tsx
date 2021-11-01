@@ -1,7 +1,16 @@
 import "./GameBoard.scss";
 import Cell from "./Cell";
 
-const GameBoard = (props: any) => {
+type GameBoardProps = {
+  board: string[];
+  playerSymbol: string;
+  nextSymbol: string;
+  gameOver: boolean;
+  winningPath: number[];
+  onBoardClicked: (index: number, symbol: string) => void;
+}; 
+
+const GameBoard = (props: GameBoardProps) => {
   const cellClickedHandler = (index: number) => {
     props.onBoardClicked(index, props.playerSymbol);
   };
@@ -14,8 +23,6 @@ const GameBoard = (props: any) => {
             symbol={value}
             index={index}
             key={index}
-            playerSymbol={props.playerSymbol}
-            nextSymbol={props.nextSymbol}
             gameOver={props.gameOver}
             winningPath={props.winningPath}
             onCellClicked={cellClickedHandler}

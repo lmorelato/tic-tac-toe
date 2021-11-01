@@ -2,12 +2,17 @@ import { Log } from "../models/Log";
 import "./Logs.scss";
 import { orderBy } from "lodash";
 
-const Logs = (props: any) => {
+type LogsProps = {
+  logs: Log[];
+  startGameLogs: string[];
+  endGameLogs: string[];
+};
+
+const Logs = (props: LogsProps) => {
   let logs: Log[] = props.logs;
   const hasLogs = logs && logs.length > 0;
-
   if (hasLogs) {
-    logs = orderBy(logs, ['order'], ['desc']);
+    logs = orderBy(logs, ["order"], ["desc"]);
   }
 
   return (
@@ -24,8 +29,8 @@ const Logs = (props: any) => {
         {hasLogs &&
           logs.map((log: Log, index: number) => (
             <div className="line px-3 pt- ml-1" key={index}>
-              - #{log.order + 1}, Player: {log.player.name.toUpperCase()}, Position{" "}
-              {log.index + 1}, Symbol: {log.player.symbol}
+              - #{log.order + 1}, Player: {log.player.name.toUpperCase()},
+              Position {log.index + 1}, Symbol: {log.player.symbol}
             </div>
           ))}
         {props.startGameLogs.map((log: string, index: number) => (
