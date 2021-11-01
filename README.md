@@ -4,7 +4,7 @@ A basic tic-tac-toe game developed in golang and vue.js v2.
 
 This game allows two users to play together on different machines.
 
-**Update: A new version with small improvments and the frontend developed in React was recently added!**
+**UPDATE: A new version with small improvments and the frontend developed in React was recently added!**
 
 
 ## Game flow
