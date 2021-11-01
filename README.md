@@ -18,7 +18,7 @@ This game allows two users to play together on different machines.
 ![game flow](https://github.com/lmorelato/tic-tac-toe/blob/main/docs/tic-tac-toe.gif "Game Flow")
 
 
-- **React frontend**
+- **NEW React frontend**
 ![game flow](https://github.com/lmorelato/tic-tac-toe/blob/main/docs/ttt-react.gif "Game Flow")
 
 ## Installation
